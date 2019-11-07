@@ -9,7 +9,6 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createSalesTaxFinancialAccount();
     $this->createPriceSetsAndFields();
     $this->createDDOriginatorNumber();
-    $this->enableTaxAndInvoicingSetting();
   }
 
   private function createMembershipTypes() {
@@ -275,11 +274,5 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         'label' => $ddNumberName,
       ]);
     }
-  }
-
-  private function enableTaxAndInvoicingSetting() {
-    civicrm_api3('Setting', 'create', [
-      'invoicing' => 1,
-    ]);
   }
 }
