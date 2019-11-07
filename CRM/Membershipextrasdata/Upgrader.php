@@ -1,134 +1,285 @@
 <?php
-use CRM_Membershipextrasdata_ExtensionUtil as E;
 
-/**
- * Collection of upgrade steps.
- */
 class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrader_Base {
 
-  // By convention, functions that look like "function upgrade_NNNN()" are
-  // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
+  private $createdMembershipTypesIdsMap;
 
-  /**
-   * Example: Run an external SQL script when the module is installed.
-   *
   public function install() {
-    $this->executeSqlFile('sql/myinstall.sql');
+    $this->createMembershipTypes();
+    $this->createSalesTaxFinancialAccount();
+    $this->createPriceSetsAndFields();
+    $this->createDDOriginatorNumber();
+    $this->enableTaxAndInvoicingSetting();
   }
 
-  /**
-   * Example: Work with entities usually not available during the install step.
-   *
-   * This method can be used for any post-install tasks. For example, if a step
-   * of your installation depends on accessing an entity that is itself
-   * created during the installation (e.g., a setting or a managed entity), do
-   * so here to avoid order of operation problems.
-   *
-  public function postInstall() {
-    $customFieldId = civicrm_api3('CustomField', 'getvalue', array(
-      'return' => array("id"),
-      'name' => "customFieldCreatedViaManagedHook",
-    ));
-    civicrm_api3('Setting', 'create', array(
-      'myWeirdFieldSetting' => array('id' => $customFieldId, 'weirdness' => 1),
-    ));
-  }
+  private function createMembershipTypes() {
+    $defaultOrgID = 1;
+    $membershipOrgIds= $this->createMembershipOrgs();
 
-  /**
-   * Example: Run an external SQL script when the module is uninstalled.
-   *
-  public function uninstall() {
-   $this->executeSqlFile('sql/myuninstall.sql');
-  }
+    $sampleMembershipTypes = [
+      [
+        'name' => 'Standard Membership',
+        'member_of_contact_id' => $defaultOrgID,
+        'financial_type_id' => 'Member Dues',
+        'duration_unit' => 'year',
+        'duration_interval' => 1,
+        'period_type' => 'rolling',
+        'minimum_fee' => 50,
+        'auto_renew' => 1,
+        'visibility' => 'Public',
+      ],
+      [
+        'name' => 'Advanced Membership',
+        'member_of_contact_id' => $defaultOrgID,
+        'financial_type_id' => 'Member Dues',
+        'duration_unit' => 'year',
+        'duration_interval' => 1,
+        'period_type' => 'rolling',
+        'minimum_fee' => 100,
+        'auto_renew' => 1,
+        'visibility' => 'Public',
+      ],
+      [
+        'name' => 'Fixed Subscription',
+        'member_of_contact_id' => $membershipOrgIds['Fixed Org'],
+        'financial_type_id' => 'Member Dues',
+        'duration_unit' => 'year',
+        'duration_interval' => 1,
+        'period_type' => 'fixed',
+        'minimum_fee' => 100,
+        'auto_renew' => 1,
+        'visibility' => 'Public',
+        'fixed_period_start_day' => 701,
+        'fixed_period_rollover_day' => 630,
+      ],
+      [
+        'name' => 'Membership Plus',
+        'member_of_contact_id' => $membershipOrgIds['Addon Department'],
+        'financial_type_id' => 'Member Dues',
+        'duration_unit' => 'year',
+        'duration_interval' => 1,
+        'period_type' => 'rolling',
+        'minimum_fee' => 24,
+        'auto_renew' => 1,
+        'visibility' => 'Public',
+      ],
+      [
+        'name' => 'Journal - British Journal of Social Work',
+        'member_of_contact_id' => $membershipOrgIds['Journal - British Journal of Social Work'],
+        'financial_type_id' => 'Member Dues',
+        'duration_unit' => 'month',
+        'duration_interval' => 12,
+        'period_type' => 'rolling',
+        'minimum_fee' => 41,
+        'auto_renew' => 1,
+        'visibility' => 'Public',
+      ],
+      [
+        'name' => 'Social Workers Union',
+        'member_of_contact_id' => $membershipOrgIds['Social Workers Union'],
+        'financial_type_id' => 'Member Dues',
+        'duration_unit' => 'month',
+        'duration_interval' => 12,
+        'period_type' => 'rolling',
+        'minimum_fee' => 20,
+        'auto_renew' => 1,
+        'visibility' => 'Public',
+      ],
+      [
+        'name' => 'Lifetime',
+        'member_of_contact_id' => $defaultOrgID,
+        'financial_type_id' => 'Member Dues',
+        'duration_unit' => 'lifetime',
+        'duration_interval' => 1,
+        'period_type' => 'rolling',
+        'minimum_fee' => 1200,
+        'auto_renew' => 0,
+        'visibility' => 'Public',
+      ],
+    ];
 
-  /**
-   * Example: Run a simple query when a module is enabled.
-   *
-  public function enable() {
-    CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
-  }
+    foreach ($sampleMembershipTypes as $membershipTypeParams) {
+      $existingRecordResponse = civicrm_api3('MembershipType', 'get', [
+        'sequential' => 1,
+        'options' => ['limit' => 1],
+        'name' => $membershipTypeParams['name'],
+      ]);
 
-  /**
-   * Example: Run a simple query when a module is disabled.
-   *
-  public function disable() {
-    CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 0 WHERE bar = "whiz"');
-  }
+      if (empty($existingRecordResponse['id'])) {
+        $response = civicrm_api3('MembershipType', 'create', $membershipTypeParams);
+        $membershipTypeId = $response['id'];
+      } else {
+        $membershipTypeId = $existingRecordResponse['id'];
+      }
 
-  /**
-   * Example: Run a couple simple queries.
-   *
-   * @return TRUE on success
-   * @throws Exception
-   *
-  public function upgrade_4200() {
-    $this->ctx->log->info('Applying update 4200');
-    CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
-    CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
-    return TRUE;
-  } // */
-
-
-  /**
-   * Example: Run an external SQL script.
-   *
-   * @return TRUE on success
-   * @throws Exception
-  public function upgrade_4201() {
-    $this->ctx->log->info('Applying update 4201');
-    // this path is relative to the extension base dir
-    $this->executeSqlFile('sql/upgrade_4201.sql');
-    return TRUE;
-  } // */
-
-
-  /**
-   * Example: Run a slow upgrade process by breaking it up into smaller chunk.
-   *
-   * @return TRUE on success
-   * @throws Exception
-  public function upgrade_4202() {
-    $this->ctx->log->info('Planning update 4202'); // PEAR Log interface
-
-    $this->addTask(E::ts('Process first step'), 'processPart1', $arg1, $arg2);
-    $this->addTask(E::ts('Process second step'), 'processPart2', $arg3, $arg4);
-    $this->addTask(E::ts('Process second step'), 'processPart3', $arg5);
-    return TRUE;
-  }
-  public function processPart1($arg1, $arg2) { sleep(10); return TRUE; }
-  public function processPart2($arg3, $arg4) { sleep(10); return TRUE; }
-  public function processPart3($arg5) { sleep(10); return TRUE; }
-  // */
-
-
-  /**
-   * Example: Run an upgrade with a query that touches many (potentially
-   * millions) of records by breaking it up into smaller chunks.
-   *
-   * @return TRUE on success
-   * @throws Exception
-  public function upgrade_4203() {
-    $this->ctx->log->info('Planning update 4203'); // PEAR Log interface
-
-    $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contribution');
-    $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contribution');
-    for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
-      $endId = $startId + self::BATCH_SIZE - 1;
-      $title = E::ts('Upgrade Batch (%1 => %2)', array(
-        1 => $startId,
-        2 => $endId,
-      ));
-      $sql = '
-        UPDATE civicrm_contribution SET foobar = whiz(wonky()+wanker)
-        WHERE id BETWEEN %1 and %2
-      ';
-      $params = array(
-        1 => array($startId, 'Integer'),
-        2 => array($endId, 'Integer'),
-      );
-      $this->addTask($title, 'executeSql', $sql, $params);
+      $this->createdMembershipTypesIdsMap[$membershipTypeParams['name']] = $membershipTypeId;
     }
-    return TRUE;
-  } // */
+  }
 
+  private function createMembershipOrgs() {
+    $orgsToCreate = [
+      'Fixed Org',
+      'Addon Department',
+      'Journal - British Journal of Social Work',
+      'Social Workers Union',
+    ];
+
+    $orgsIds = [];
+    foreach ($orgsToCreate as $orgName) {
+      $existingRecordResponse = civicrm_api3('Contact', 'get', [
+        'sequential' => 1,
+        'options' => ['limit' => 1],
+        'contact_type' => 'Organization',
+        'organization_name' => $orgName,
+      ]);
+
+      if (empty($existingRecordResponse['id'])) {
+        $createdRecordResponse = civicrm_api3('Contact', 'create', [
+          'contact_type' => 'Organization',
+          'organization_name' => $orgName,
+        ]);
+
+        $orgsIds[$orgName] = $createdRecordResponse['id'];
+      } else {
+        $orgsIds[$orgName] = $existingRecordResponse['id'];
+      }
+    }
+
+    return $orgsIds;
+  }
+
+  private function createSalesTaxFinancialAccount() {
+    $existingRecordResponse = civicrm_api3('FinancialAccount', 'get', [
+      'sequential' => 1,
+      'options' => ['limit' => 1],
+      'name' => 'Sales Tax',
+    ]);
+
+    if (empty($existingRecordResponse['id'])) {
+      civicrm_api3('FinancialAccount', 'create', [
+        'name' => 'Sales Tax',
+        'contact_id' => 1,
+        'financial_account_type_id' => 'Liability',
+        'accounting_code' => 5500,
+        'is_header_account' => 0,
+        'is_deductible' => 1,
+        'is_tax' => 1,
+        'tax_rate' => 20,
+        'is_active' => 1,
+        'is_default' => 0,
+      ]);
+
+      $memberDuesFinancialTypeId = 2;
+      civicrm_api3('EntityFinancialAccount', 'create', [
+        'financial_account_id' => 'Sales Tax',
+        'entity_table' => 'civicrm_financial_type',
+        'entity_id' => $memberDuesFinancialTypeId,
+        'account_relationship' => 'Sales Tax Account is',
+      ]);
+    }
+  }
+
+  private function createPriceSetsAndFields() {
+    $existingRecordResponse = civicrm_api3('PriceSet', 'get', [
+      'sequential' => 1,
+      'title' => 'Secondary Membership',
+      'options' => ['limit' => 1],
+    ]);
+
+    if (empty($existingRecordResponse['id'])) {
+      $createdRecordResponse = civicrm_api3('PriceSet', 'create', [
+        'title' => 'Secondary Membership',
+        'name' => 'secondary_membership',
+        'extends' => 'CiviMember',
+        'min_amount' => 100,
+        'financial_type_id' => 'Member Dues',
+        'is_active' => 1,
+      ]);
+
+      $priceSetId = $createdRecordResponse['id'];
+    } else {
+      $priceSetId = $existingRecordResponse['id'];
+    }
+
+    $membershipPriceFieldParams = [
+      'price_set_id'=> $priceSetId,
+      'label'=> 'Secondary Membership',
+      'html_type'=> 'Radio',
+      'is_enter_qty'=> 0,
+      'weight'=> 1,
+      'is_display_amounts'=> 1,
+      'options_per_line'=> 1,
+      'is_active'=> 1,
+      'is_required'=> 1,
+      'visibility_id'=> 1
+    ];
+    $createdMembershipPriceFieldResponse = civicrm_api3('PriceField', 'create', $membershipPriceFieldParams);
+    if (!empty($createdMembershipPriceFieldResponse['id'])) {
+      civicrm_api3('PriceFieldValue', 'create', [
+        'price_field_id' => $createdMembershipPriceFieldResponse['id'],
+        'label' => 'Fixed Subscription',
+        'amount' => 100,
+        'membership_type_id' => $this->createdMembershipTypesIdsMap['Fixed Subscription'],
+        'financial_type_id' => 'Member Dues',
+        'membership_num_terms' => 1,
+        'non_deductible_amount' => 0,
+      ]);
+    }
+
+    $addOnPriceFieldParams = [
+      'price_set_id'=> $priceSetId,
+      'label'=> 'Secondary Add ons',
+      'html_type'=> 'CheckBox',
+      'is_enter_qty'=> 0,
+      'weight'=> 2,
+      'is_display_amounts'=> 1,
+      'options_per_line'=> 1,
+      'is_active'=> 1,
+      'is_required'=> 0,
+      'visibility_id'=> 1
+    ];
+    $createdAddOnPriceFieldResponse = civicrm_api3('PriceField', 'create', $addOnPriceFieldParams);
+    if (!empty($createdAddOnPriceFieldResponse['id'])) {
+      civicrm_api3('PriceFieldValue', 'create', [
+        'price_field_id' => $createdAddOnPriceFieldResponse['id'],
+        'label' => 'Standard Membership',
+        'amount' => 10,
+        'membership_type_id' => $this->createdMembershipTypesIdsMap['Standard Membership'],
+        'financial_type_id' => 'Member Dues',
+        'membership_num_terms' => 1,
+        'non_deductible_amount' => 0,
+        'is_default' => 1,
+      ]);
+
+      civicrm_api3('PriceFieldValue', 'create', [
+        'price_field_id' => $createdAddOnPriceFieldResponse['id'],
+        'label' => 'Advanced Membership',
+        'amount' => 120,
+        'membership_type_id' => $this->createdMembershipTypesIdsMap['Advanced Membership'],
+        'financial_type_id' => 'Member Dues',
+        'membership_num_terms' => 1,
+        'non_deductible_amount' => 0,
+      ]);
+    }
+  }
+
+  private function createDDOriginatorNumber() {
+    $ddNumbersToCreate = [
+      '01',
+      '02',
+    ];
+
+    foreach ($ddNumbersToCreate as $ddNumberName) {
+      civicrm_api3('OptionValue', 'create', [
+        'option_group_id' => 'direct_debit_originator_number',
+        'label' => $ddNumberName,
+      ]);
+    }
+  }
+
+  private function enableTaxAndInvoicingSetting() {
+    civicrm_api3('Setting', 'create', [
+      'invoicing' => 1,
+    ]);
+  }
 }
