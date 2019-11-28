@@ -1,5 +1,7 @@
 <?php
 
+use CRM_Membershipextrasdata_ExtensionUtil as ExtensionUtil;
+
 class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrader_Base {
 
   private $createdMembershipTypesIdsMap;
@@ -9,6 +11,8 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createSalesTaxFinancialAccount();
     $this->createPriceSetsAndFields();
     $this->createDDOriginatorNumber();
+    $this->createTestingContributionPages();
+    $this->createTestingWebforms();
   }
 
   private function createMembershipTypes() {
@@ -275,4 +279,73 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       ]);
     }
   }
+  
+  private function createTestingContributionPages() {
+    $this->createOfflinePaymentProcessorMembershipSignupContributionPage();
+    $this->createDDProcessorMembershipSignupContributionPage();
+  }
+
+  private function createOfflinePaymentProcessorMembershipSignupContributionPage() {
+    civicrm_api3('ContributionPage', 'create', [
+      'title' => 'Membership Signup and renewal-Offline PaymentProcessor',
+      'financial_type_id' => 2,
+      'payment_processor' => 1,
+      'is_credit_card_only' => 0,
+      'is_monetary' => 1,
+      'is_active' => 1,
+      'is_recur' => 0,
+      'is_confirm_enabled' => 1,
+      'is_recur_interval' => 0,
+      'is_recur_installments' => 0,
+      'adjust_recur_start_date' => 0,
+      'is_pay_later' => 0,
+      'pay_later_text' => 'I will send payment by check',
+      'is_partial_payment' => 0,
+      'is_allow_other_amount' => 0,
+      'is_email_receipt' => 0,
+      'amount_block_is_active' => 0,
+      'currency' => 'GBP',
+      'is_share' => 0,
+      'is_billing_required' => 0,
+      'start_date' => date('Y-m-d'),
+    ]);
+  }
+
+  private function createDDProcessorMembershipSignupContributionPage() {
+    civicrm_api3('ContributionPage', 'create', [
+      'title' => 'Membership signup and renewal-Direct Debit',
+      'financial_type_id' => 2,
+      'payment_processor' => 3,
+      'is_credit_card_only' => 0,
+      'is_monetary' => 1,
+      'is_active' => 1,
+      'is_recur' => 0,
+      'is_confirm_enabled' => 1,
+      'is_recur_interval' => 0,
+      'is_recur_installments' => 0,
+      'adjust_recur_start_date' => 0,
+      'is_pay_later' => 0,
+      'pay_later_text' => 'I will send payment by check',
+      'is_partial_payment' => 0,
+      'is_allow_other_amount' => 0,
+      'is_email_receipt' => 0,
+      'amount_block_is_active' => 0,
+      'currency' => 'GBP',
+      'is_share' => 0,
+      'is_billing_required' => 0,
+      'start_date' => date('Y-m-d'),
+    ]);
+  }
+
+  private function createTestingWebforms() {
+    $this->importWebform('WebformExport/DDSignup.drupal');
+    $this->importWebform('WebformExport/OfflineSignup.drupal');
+  }
+
+  private function importWebform($webformExportPath) {
+    $webformFullPath = ExtensionUtil::path($webformExportPath);
+    $webformExportCode = file_get_contents($webformFullPath, "r");
+    node_export_import($webformExportCode);
+  }
+
 }
