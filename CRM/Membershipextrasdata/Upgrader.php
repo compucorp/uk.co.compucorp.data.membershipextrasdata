@@ -11,7 +11,6 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createSalesTaxFinancialAccount();
     $this->createPriceSetsAndFields();
     $this->createDDOriginatorNumber();
-    $this->setDirectDebitDefaultConfigurations();
     $this->createTestingContributionPages();
     $this->createTestingWebforms();
   }
@@ -280,18 +279,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       ]);
     }
   }
-
-  private function setDirectDebitDefaultConfigurations() {
-    civicrm_api3('Setting', 'create', [
-      'manualdirectdebit_default_reference_prefix' => 'DD',
-      'manualdirectdebit_minimum_reference_prefix_length' => 6,
-      'manualdirectdebit_new_instruction_run_dates' => 1,
-      'manualdirectdebit_payment_collection_run_dates' => 2,
-      'manualdirectdebit_minimum_days_to_first_payment' => 1,
-      'manualdirectdebit_days_in_advance_for_collection_reminder' => 30,
-    ]);
-  }
-
+  
   private function createTestingContributionPages() {
     $this->createOfflinePaymentProcessorMembershipSignupContributionPage();
     $this->createDDProcessorMembershipSignupContributionPage();
