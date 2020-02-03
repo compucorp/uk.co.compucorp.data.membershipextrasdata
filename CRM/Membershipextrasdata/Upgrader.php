@@ -484,6 +484,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         'amount_type' => 1,
         'amount' => 50,
         'count_max' => 0,
+        'description' => '50 Percent Discount',
         'is_active' => 1
       ]);
     }
@@ -499,6 +500,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         'amount_type' => 2,
         'amount' => 50,
         'count_max' => 0,
+        'description' => '50 Pound Discount',
         'is_active' => 1,
       ]);
     }
