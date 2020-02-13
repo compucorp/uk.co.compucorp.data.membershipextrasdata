@@ -7,6 +7,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   private $createdMembershipTypesIdsMap;
 
   public function install() {
+    $this->enableTaxAndInvoiceSettings();
     $this->createMembershipTypes();
     $this->createSalesTaxFinancialAccount();
     $this->createPriceSetsAndFields();
@@ -14,6 +15,20 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createDiscountCodes();
     $this->createTestingContributionPages();
     $this->createTestingWebforms();
+  }
+
+  private function enableTaxAndInvoiceSettings() {
+    $invoiceParams = [
+      'invoicing' => ['invoicing' => 1],
+      'invoice_prefix' => 'INV_',
+      'credit_notes_prefix' => 'CN_',
+      'due_date' => '10',
+      'due_date_period' => 'days',
+      'notes' => '',
+      'tax_term' => 'Sales Tax',
+      'tax_display_settings' => 'Inclusive',
+    ];
+    Civi::settings()->set('contribution_invoice_settings', $invoiceParams);
   }
 
   private function createMembershipTypes() {
@@ -473,6 +488,8 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   }
 
   private function createDiscountCodes() {
+    $allMembershipTypesIds = $this->getAllMembershipTypesIds();
+
     $response = civicrm_api3('DiscountCode', 'get', [
       'sequential' => 1,
       'return' => ['id'],
@@ -485,6 +502,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         'amount' => 50,
         'count_max' => 0,
         'description' => '50 Percent Discount',
+        'memberships' => $allMembershipTypesIds,
         'is_active' => 1
       ]);
     }
@@ -501,9 +519,27 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         'amount' => 50,
         'count_max' => 0,
         'description' => '50 Pound Discount',
+        'memberships' => $allMembershipTypesIds,
         'is_active' => 1,
       ]);
     }
+  }
+
+  private function getAllMembershipTypesIds() {
+    $apiResponse = civicrm_api3('MembershipType', 'get', [
+      'sequential' => 1,
+      'return' => ['id'],
+      'options' => ['limit' => 0],
+    ]);
+
+    $membershipTypes = [];
+    if ($apiResponse['count'] > 0) {
+      foreach ($apiResponse['values'] as $membership) {
+        $membershipTypes[] = $membership['id'];
+      }
+    }
+
+    return $membershipTypes;
   }
 
   private function createTestingContributionPages() {
@@ -590,6 +626,11 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   }
 
   private function createTestingWebforms() {
+    $this->importWebforms();
+    $this->enableDiscountFieldsOnWebforms();
+  }
+
+  private function importWebforms() {
     $webformExportsDirectoryName = ExtensionUtil::path('WebformExport');
     $exportFiles = array_diff(scandir($webformExportsDirectoryName), ['.', '..']);
     foreach ($exportFiles as $fileName) {
@@ -601,6 +642,19 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   private function importWebformByPath($webformExportPath) {
     $webformExportCode = file_get_contents($webformExportPath, 'r');
     node_export_import($webformExportCode);
+  }
+
+  private function enableDiscountFieldsOnWebforms() {
+    $allWebformsNodedIds = db_select('node', 'n')
+      ->fields('n', array('nid'))
+      ->condition('type', 'webform', '=')
+      ->execute()
+      ->fetchCol();
+
+    foreach ($allWebformsNodedIds as $webformsNid) {
+      $wf_me_discount_settings = new wf_me_discount_settings();
+      $wf_me_discount_settings->save($webformsNid, 1);
+    }
   }
 
 }
