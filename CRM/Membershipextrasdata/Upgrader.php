@@ -13,7 +13,6 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createPriceSetsAndFields();
     $this->createDDOriginatorNumber();
     $this->createDiscountCodes();
-    $this->createTestingContributionPages();
     $this->createTestingWebforms();
   }
 
@@ -540,89 +539,6 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     }
 
     return $membershipTypes;
-  }
-
-  private function createTestingContributionPages() {
-    $this->createOfflinePaymentProcessorMembershipSignupContributionPage();
-    $this->createDDProcessorMembershipSignupContributionPage();
-  }
-
-  private function createOfflinePaymentProcessorMembershipSignupContributionPage() {
-    civicrm_api3('ContributionPage', 'create', [
-      'title' => 'Membership Signup and renewal-Offline PaymentProcessor',
-      'financial_type_id' => 2,
-      'payment_processor' => $this->getActivePaymentProcessors(),
-      'is_credit_card_only' => 0,
-      'is_monetary' => 1,
-      'is_active' => 1,
-      'is_recur' => 0,
-      'is_confirm_enabled' => 1,
-      'is_recur_interval' => 0,
-      'is_recur_installments' => 0,
-      'adjust_recur_start_date' => 0,
-      'is_pay_later' => 0,
-      'pay_later_text' => 'I will send payment by check',
-      'is_partial_payment' => 0,
-      'is_allow_other_amount' => 1,
-      'is_email_receipt' => 1,
-      'receipt_from_name' => 'Compuclient example receipt',
-      'receipt_from_email' => 'email@example.com',
-      'amount_block_is_active' => 0,
-      'currency' => 'GBP',
-      'is_share' => 0,
-      'is_billing_required' => 0,
-      'start_date' => date('Y-m-d'),
-    ]);
-  }
-
-  private function createDDProcessorMembershipSignupContributionPage() {
-    civicrm_api3('ContributionPage', 'create', [
-      'title' => 'Membership signup and renewal-Direct Debit',
-      'financial_type_id' => 2,
-      'payment_processor' => $this->getActivePaymentProcessors(),
-      'is_credit_card_only' => 0,
-      'is_monetary' => 1,
-      'is_active' => 1,
-      'is_recur' => 0,
-      'is_confirm_enabled' => 1,
-      'is_recur_interval' => 0,
-      'is_recur_installments' => 0,
-      'adjust_recur_start_date' => 0,
-      'is_pay_later' => 0,
-      'pay_later_text' => 'I will send payment by check',
-      'is_partial_payment' => 0,
-      'is_allow_other_amount' => 1,
-      'is_email_receipt' => 1,
-      'receipt_from_name' => 'Compuclient example receipt',
-      'receipt_from_email' => 'email@example.com',
-      'amount_block_is_active' => 0,
-      'currency' => 'GBP',
-      'is_share' => 0,
-      'is_billing_required' => 0,
-      'start_date' => date('Y-m-d'),
-    ]);
-  }
-
-  /**
-   * Return all active payment processor names.
-   */
-  private function getActivePaymentProcessors() {
-    $paymentProcessorNames = [];
-
-    $activePaymentProcessors = civicrm_api3('PaymentProcessor', 'get', [
-      'sequential' => 1,
-      'return' => ['name'],
-      'is_test' => 0,
-      'is_active' => 1,
-    ]);
-
-    if(!$activePaymentProcessors['is_error']) {
-      foreach ($activePaymentProcessors['values'] as $paymentProcessor) {
-        $paymentProcessorNames[] = $paymentProcessor['name'];
-      }
-    }
-
-    return $paymentProcessorNames;
   }
 
   private function createTestingWebforms() {
