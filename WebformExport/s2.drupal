@@ -933,7 +933,7 @@ array(
             'form_key' => 'civicrm_1_contact_1_cg9_custom_32',
             'name' => 'Authorisation Date',
             'type' => 'hidden',
-            'value' => ' [current-date:custom:Ymd]',
+            'value' => '',
             'extra' => array(
               'private' => 0,
               'hidden_type' => 'value',
