@@ -12,6 +12,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createSalesTaxFinancialAccount();
     $this->createPriceSetsAndFields();
     $this->createDDOriginatorNumber();
+    $this->setDDPaymentMethodFinancialAccount();
     $this->createDiscountCodes();
     $this->createTestingWebforms();
   }
@@ -484,6 +485,20 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         'label' => $ddNumberName,
       ]);
     }
+  }
+  
+  private function setDDPaymentMethodFinancialAccount() {
+    $directDebitPaymentMethodOptionValueId = civicrm_api3('OptionValue', 'getvalue', [
+      'return' => "id",
+      'option_group_id' => 'payment_instrument',
+      'name' => 'direct_debit',
+    ]);
+    civicrm_api3('EntityFinancialAccount', 'create', [
+      'entity_table' => 'civicrm_option_value',
+      'entity_id' => $directDebitPaymentMethodOptionValueId,
+      'account_relationship' => 'Asset Account is',
+      'financial_account_id' => 'Deposit Bank Account',
+    ]);
   }
 
   private function createDiscountCodes() {
