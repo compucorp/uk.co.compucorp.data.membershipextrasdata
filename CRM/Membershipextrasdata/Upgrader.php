@@ -32,7 +32,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   }
 
   private function createMembershipTypes() {
-    $membershipOrgIds= $this->createMembershipOrgs();
+    $membershipOrgIds = $this->createMembershipOrgs();
     $employerOfRelationshipTypeId = $this->getEmployerOfRelationshipTypeId();
 
     $sampleMembershipTypes = [
@@ -168,7 +168,8 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       if (empty($existingRecordResponse['id'])) {
         $response = civicrm_api3('MembershipType', 'create', $membershipTypeParams);
         $membershipTypeId = $response['id'];
-      } else {
+      }
+      else {
         $membershipTypeId = $existingRecordResponse['id'];
       }
 
@@ -187,7 +188,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       'Demo organisation 7 - Corporate rolling - Silver - 1yr',
       'Demo organisation 8 - Corporate rolling - Add-on1 - 1yr',
       'Demo organisation 9 - Corporate rolling - Add-on2 - 1yr',
-      'Demo organisation 10 - Corporate rolling - Add-on3 - 1yr'
+      'Demo organisation 10 - Corporate rolling - Add-on3 - 1yr',
     ];
 
     $orgsIds = [];
@@ -206,7 +207,8 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         ]);
 
         $orgsIds[$orgName] = $createdRecordResponse['id'];
-      } else {
+      }
+      else {
         $orgsIds[$orgName] = $existingRecordResponse['id'];
       }
     }
@@ -286,17 +288,17 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $priceSetId = $createdRecordResponse['id'];
 
     $createdStandardPriceFieldResponse = civicrm_api3('PriceField', 'create', [
-      'price_set_id'=> $priceSetId,
+      'price_set_id' => $priceSetId,
       'name' => 'field1',
-      'label'=> 'Standard',
-      'html_type'=> 'Select',
-      'is_enter_qty'=> 0,
-      'weight'=> 1,
-      'is_display_amounts'=> 1,
-      'options_per_line'=> 1,
-      'is_active'=> 1,
-      'is_required'=> 0,
-      'visibility_id'=> 1
+      'label' => 'Standard',
+      'html_type' => 'Select',
+      'is_enter_qty' => 0,
+      'weight' => 1,
+      'is_display_amounts' => 1,
+      'options_per_line' => 1,
+      'is_active' => 1,
+      'is_required' => 0,
+      'visibility_id' => 1,
     ]);
     civicrm_api3('PriceFieldValue', 'create', [
       'price_field_id' => $createdStandardPriceFieldResponse['id'],
@@ -320,17 +322,17 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     ]);
 
     $createdAddOnPriceFieldResponse = civicrm_api3('PriceField', 'create', [
-      'price_set_id'=> $priceSetId,
-      'label'=> 'Add On',
+      'price_set_id' => $priceSetId,
+      'label' => 'Add On',
       'name' => 'add_on',
-      'html_type'=> 'CheckBox',
-      'is_enter_qty'=> 0,
-      'weight'=> 2,
-      'is_display_amounts'=> 1,
-      'options_per_line'=> 1,
-      'is_active'=> 1,
-      'is_required'=> 0,
-      'visibility_id'=> 1
+      'html_type' => 'CheckBox',
+      'is_enter_qty' => 0,
+      'weight' => 2,
+      'is_display_amounts' => 1,
+      'options_per_line' => 1,
+      'is_active' => 1,
+      'is_required' => 0,
+      'visibility_id' => 1,
     ]);
 
     civicrm_api3('PriceFieldValue', 'create', [
@@ -391,17 +393,17 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $priceSetId = $createdRecordResponse['id'];
 
     $createdMainPriceFieldResponse = civicrm_api3('PriceField', 'create', [
-      'price_set_id'=> $priceSetId,
+      'price_set_id' => $priceSetId,
       'name' => 'main',
-      'label'=> 'Main',
-      'html_type'=> 'Select',
-      'is_enter_qty'=> 0,
-      'weight'=> 1,
-      'is_display_amounts'=> 1,
-      'options_per_line'=> 1,
-      'is_active'=> 1,
-      'is_required'=> 0,
-      'visibility_id'=> 1
+      'label' => 'Main',
+      'html_type' => 'Select',
+      'is_enter_qty' => 0,
+      'weight' => 1,
+      'is_display_amounts' => 1,
+      'options_per_line' => 1,
+      'is_active' => 1,
+      'is_required' => 0,
+      'visibility_id' => 1,
     ]);
     civicrm_api3('PriceFieldValue', 'create', [
       'price_field_id' => $createdMainPriceFieldResponse['id'],
@@ -425,17 +427,17 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     ]);
 
     $createdAddOnPriceFieldResponse = civicrm_api3('PriceField', 'create', [
-      'price_set_id'=> $priceSetId,
-      'label'=> 'Add-On',
+      'price_set_id' => $priceSetId,
+      'label' => 'Add-On',
       'name' => 'add_on',
-      'html_type'=> 'CheckBox',
-      'is_enter_qty'=> 0,
-      'weight'=> 2,
-      'is_display_amounts'=> 1,
-      'options_per_line'=> 1,
-      'is_active'=> 1,
-      'is_required'=> 0,
-      'visibility_id'=> 1
+      'html_type' => 'CheckBox',
+      'is_enter_qty' => 0,
+      'weight' => 2,
+      'is_display_amounts' => 1,
+      'options_per_line' => 1,
+      'is_active' => 1,
+      'is_required' => 0,
+      'visibility_id' => 1,
     ]);
 
     civicrm_api3('PriceFieldValue', 'create', [
@@ -486,7 +488,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       ]);
     }
   }
-  
+
   private function setDDPaymentMethodFinancialAccount() {
     $directDebitPaymentMethodOptionValueId = civicrm_api3('OptionValue', 'getvalue', [
       'return' => "id",
@@ -509,7 +511,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       'return' => ['id'],
       'code' => '50Percent',
     ]);
-    if(empty($response['id'])) {
+    if (empty($response['id'])) {
       civicrm_api3('DiscountCode', 'create', [
         'code' => '50Percent',
         'amount_type' => 1,
@@ -517,7 +519,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
         'count_max' => 0,
         'description' => '50 Percent Discount',
         'memberships' => $allMembershipTypesIds,
-        'is_active' => 1
+        'is_active' => 1,
       ]);
     }
 
@@ -526,7 +528,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       'return' => ['id'],
       'code' => '50Fixed',
     ]);
-    if(empty($response['id'])) {
+    if (empty($response['id'])) {
       civicrm_api3('DiscountCode', 'create', [
         'code' => '50Fixed',
         'amount_type' => 2,
