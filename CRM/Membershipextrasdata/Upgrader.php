@@ -566,6 +566,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   private function importWebforms() {
     $webformExportsDirectoryName = ExtensionUtil::path('WebformExport');
     $exportFiles = array_diff(scandir($webformExportsDirectoryName), ['.', '..']);
+    usort($exportFiles, 'strnatcmp');
     foreach ($exportFiles as $fileName) {
       $filePath = $webformExportsDirectoryName . '/' . $fileName;
       $this->importWebformByPath($filePath);
