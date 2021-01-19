@@ -7,8 +7,10 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   private $priceSetData = NULL;
   private $orgsIdsMap;
   private $membershipTypesIdsMap;
+  private $memberDuesFinancialTypeId = NULL;
 
   public function install() {
+    $this->setMemberDuesFinancialTypeId();
     $this->enableTaxAndInvoiceSettings();
     $this->createSalesTaxFinancialAccount();
     $this->createDDOriginatorNumber();
@@ -19,6 +21,30 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createPriceSetsAndFields();
     $this->createDiscountCodes();
     $this->createTestingWebforms();
+  }
+
+  /**
+   * Obtains value for member dues financial type option value.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function setMemberDuesFinancialTypeId() {
+    $existingRecordResponse = civicrm_api3('FinancialType', 'get', [
+      'return' => 'id',
+      'name' => 'Member Dues',
+    ]);
+
+    if (!empty($existingRecordResponse["id"])) {
+      $this->memberDuesFinancialTypeId = $existingRecordResponse['id'];
+      return;
+    }
+
+    $createdRecordResponse = civicrm_api3("FinancialType", "create", [
+      'name' => 'Member Dues',
+      'is_active' => 1,
+    ]);
+
+    $this->memberDuesFinancialTypeId = $createdRecordResponse['id'];
   }
 
   private function enableTaxAndInvoiceSettings() {
@@ -36,8 +62,6 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
   }
 
   private function createSalesTaxFinancialAccount() {
-    $memberDuesFinancialTypeId = 2;
-
     $params = [
       "name" => "Sales Tax",
       "contact_id" => 1,
@@ -52,7 +76,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       "entity" => [
         "financial_account_id" => "Sales Tax",
         "entity_table" => "civicrm_financial_type",
-        "entity_id" => $memberDuesFinancialTypeId,
+        "entity_id" => $this->memberDuesFinancialTypeId,
         "account_relationship" => "Sales Tax Account is",
       ],
     ];
