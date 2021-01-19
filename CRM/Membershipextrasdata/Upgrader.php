@@ -3,10 +3,30 @@
 use CRM_Membershipextrasdata_ExtensionUtil as ExtensionUtil;
 
 class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrader_Base {
-  private $membershipData = NULL;
-  private $priceSetData = NULL;
-  private $orgsIdsMap;
-  private $membershipTypesIdsMap;
+
+  /**
+   * @var array
+   */
+  private $membershipData = [];
+
+  /**
+   * @var array
+   */
+  private $priceSetData = [];
+
+  /**
+   * @var array
+   */
+  private $orgsIdsMap = [];
+
+  /**
+   * @var array
+   */
+  private $membershipTypesIdsMap = [];
+
+  /**
+   * @var int
+   */
   private $memberDuesFinancialTypeId = NULL;
 
   public function install() {
@@ -47,6 +67,9 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->memberDuesFinancialTypeId = $createdRecordResponse['id'];
   }
 
+  /**
+   * Enable tax and invoice
+   */
   private function enableTaxAndInvoiceSettings() {
     $invoiceParams = [
       "invoicing" => ["invoicing" => 1],
@@ -61,6 +84,9 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     Civi::settings()->set("contribution_invoice_settings", $invoiceParams);
   }
 
+  /**
+   * Create sales tax financial account
+   */
   private function createSalesTaxFinancialAccount() {
     $params = [
       "name" => "Sales Tax",
@@ -84,6 +110,11 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     CRM_Membershipextrasdata_Factory_FinancialAccount::create($params);
   }
 
+  /**
+   * Create originator number for direct debit
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function createDDOriginatorNumber() {
     $ddNumbersToCreate = ["01", "02"];
 
@@ -95,6 +126,11 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     }
   }
 
+  /**
+   * Set related financial account with direct debit
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function setDDPaymentMethodFinancialAccount() {
     $directDebitPaymentMethodOptionValueId = civicrm_api3("OptionValue", "getvalue", [
       "return" => "id",
@@ -109,6 +145,9 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     ]);
   }
 
+  /**
+   *  Import Membership Type and PriceSet data
+   */
   private function importMembershipTypesAndPriceSets() {
     $jsonData = file_get_contents(ExtensionUtil::path("MembershipTypesAndPriceSetsData.json"), "r");
     $data = json_decode($jsonData, TRUE);
@@ -118,6 +157,11 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     unset($data);
   }
 
+  /**
+   * Create Organizations
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function createMembershipOrgs() {
     foreach ($this->membershipData as $orgName => $orgData) {
       $org = CRM_Membershipextrasdata_Factory_Contact::createOrg($orgName);
@@ -125,6 +169,11 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     }
   }
 
+  /**
+   * Create Membership Types
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function createMembershipTypes() {
     // Add relationship_type_id to membership types
     foreach ($this->membershipData as $orgName => $orgData) {
@@ -153,12 +202,20 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     }
   }
 
+  /**
+   * @param $name
+   *
+   * @return mixed|null
+   * @throws \CiviCRM_API3_Exception
+   */
   private function getRelationshipTypeIdByName($name) {
     $result = civicrm_api3("RelationshipType", "get", [
       "sequential" => 1,
       "name_b_a" => $name,
     ]);
 
+    // @note It is a reserved relation type
+    // should we remove this check
     if (!empty($result["id"])) {
       return $result["id"];
     }
@@ -166,14 +223,19 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     return NULL;
   }
 
+  /**
+   * Create priceSet
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function createPriceSetsAndFields() {
     // Add membership_type_id to price set field values
     $membershipTypesIdsMap = $this->membershipTypesIdsMap;
     foreach ($this->priceSetData as $key => $priceSetItem) {
       $this->priceSetData[$key]["fields"] = array_map(function ($field) use ($membershipTypesIdsMap) {
         $field["values"] = array_map(function ($value) use ($membershipTypesIdsMap) {
-            $value["membership_type_id"] = $membershipTypesIdsMap[$value["label"]];
-            return $value;
+          $value["membership_type_id"] = $membershipTypesIdsMap[$value["label"]];
+          return $value;
         }, $field["values"]);
         return $field;
       }, $priceSetItem["fields"]);
@@ -184,6 +246,11 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     }
   }
 
+  /**
+   * Create Discount codes
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   private function createDiscountCodes() {
     $allMembershipTypesIds = $this->getAllMembershipTypesIds();
 
@@ -222,6 +289,12 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     }
   }
 
+  /**
+   * Get membership types ids
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   private function getAllMembershipTypesIds() {
     $apiResponse = civicrm_api3("MembershipType", "get", [
       "sequential" => 1,
@@ -239,14 +312,23 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     return $membershipTypes;
   }
 
+  /**
+   * Start importing webforms
+   */
   private function createTestingWebforms() {
     $this->importWebforms();
     $this->enableDiscountFieldsOnWebforms();
   }
 
+  /**
+   * Import webforms from exported nodes data
+   */
   private function importWebforms() {
     $webformExportsDirectoryName = ExtensionUtil::path("WebformExport");
-    $exportFiles = array_diff(scandir($webformExportsDirectoryName), [".", ".."]);
+    $exportFiles = array_diff(scandir($webformExportsDirectoryName), [
+      ".",
+      "..",
+    ]);
     usort($exportFiles, "strnatcmp");
     foreach ($exportFiles as $fileName) {
       $filePath = $webformExportsDirectoryName . "/" . $fileName;
@@ -254,11 +336,17 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     }
   }
 
+  /**
+   * @param $webformExportPath
+   */
   private function importWebformByPath($webformExportPath) {
     $webformExportCode = file_get_contents($webformExportPath, "r");
     node_export_import($webformExportCode);
   }
 
+  /**
+   * Enable the discount fields on webforms
+   */
   private function enableDiscountFieldsOnWebforms() {
     $allWebformsNodedIds = db_select("node", "n")
       ->fields("n", ["nid"])

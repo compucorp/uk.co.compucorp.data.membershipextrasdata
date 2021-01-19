@@ -2,6 +2,12 @@
 
 class CRM_Membershipextrasdata_Factory_MembershipType {
 
+  /**
+   * @param $params
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   public static function create($params) {
     $existingRecordResponse = civicrm_api3("MembershipType", "get", [
       "sequential" => 1,

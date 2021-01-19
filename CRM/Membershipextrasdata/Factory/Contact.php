@@ -2,6 +2,12 @@
 
 class CRM_Membershipextrasdata_Factory_Contact {
 
+  /**
+   * @param $name
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
   public static function createOrg($name) {
     $existingRecordResponse = civicrm_api3("Contact", "get", [
       "sequential" => 1,

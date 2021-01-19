@@ -2,6 +2,11 @@
 
 class CRM_Membershipextrasdata_Factory_PriceFieldValue {
 
+  /**
+   * @param $params
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public static function create($params) {
     $defaultFieldValueParams = [
       "financial_type_id" => "Member Dues",
