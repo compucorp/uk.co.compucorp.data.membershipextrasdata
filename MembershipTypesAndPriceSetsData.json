@@ -1,0 +1,158 @@
+{
+  "membershipData": {
+    "Demo organisation 1 - Individual rolling Gold - 1yr": {
+      "membership_type": {
+        "name": "Individual annual rolling membership - Gold - 1 yr",
+        "minimum_fee": 120
+      }
+    },
+    "Demo organisation 2 - Individual rolling Silver - 1yr": {
+      "membership_type": {
+        "name": "Individual annual rolling membership - Silver - 1 yr",
+        "minimum_fee": 90.45
+      }
+    },
+    "Demo organisation 3 - Individual rolling Add-on1 - 1yr": {
+      "membership_type": {
+        "name": "Individual annual rolling membership - Add-on1 - 1 yr",
+        "minimum_fee": 90
+      }
+    },
+    "Demo organisation 4 - Individual rolling Add-on2 - 1yr": {
+      "membership_type": {
+        "name": "Individual annual rolling membership - Add-on2 - 1 yr",
+        "minimum_fee": 90
+      }
+    },
+    "Demo organisation 5 - Individual rolling Add-on3 - 1yr": {
+      "membership_type": {
+        "name": "Individual annual rolling membership - Add-on3 - 1 yr",
+        "minimum_fee": 90
+      }
+    },
+    "Demo organisation 6 - Corporate rolling - Gold - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual rolling membership - Gold - 1 yr",
+        "minimum_fee": 1200,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a"
+      }
+    },
+    "Demo organisation 7 - Corporate rolling - Silver - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual rolling membership - Silver - 1 yr",
+        "minimum_fee": 900.45,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a"
+      }
+    },
+    "Demo organisation 8 - Corporate rolling - Add-on1 - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual rolling membership - Add-on1 - 1 yr",
+        "minimum_fee": 900,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a"
+      }
+    },
+    "Demo organisation 9 - Corporate rolling - Add-on2 - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual rolling membership - Add-on2 - 1 yr",
+        "minimum_fee": 900,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a"
+      }
+    },
+    "Demo organisation 10 - Corporate rolling - Add-on3 - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual rolling membership - Add-on3 - 1 yr",
+        "minimum_fee": 900,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a"
+      }
+    }
+  },
+  "priceSetData": [
+    {
+      "title": "Individual Membership Rolling",
+      "min_amount": 100,
+      "fields": [
+        {
+          "is_required": 1,
+          "label": "Standard",
+          "html_type": "Select",
+          "values": [
+            {
+              "label": "Individual annual rolling membership - Gold - 1 yr",
+              "amount": 120
+            },
+            {
+              "label": "Individual annual rolling membership - Silver - 1 yr",
+              "amount": 90.45
+            }
+          ]
+        },
+        {
+          "is_required": 0,
+          "label": "Add-On",
+          "html_type": "CheckBox",
+          "values": [
+            {
+              "label": "Individual annual rolling membership - Add-on1 - 1 yr",
+              "amount": 90
+            },
+            {
+              "label": "Individual annual rolling membership - Add-on2 - 1 yr",
+              "amount": 90
+            },
+            {
+              "label": "Individual annual rolling membership - Add-on3 - 1 yr",
+              "amount": 90,
+              "is_default": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Corporate Membership Rolling",
+      "min_amount": 100,
+      "fields": [
+        {
+          "is_required": 1,
+          "label": "Standard",
+          "html_type": "Select",
+          "values": [
+            {
+              "label": "Corporate annual rolling membership - Gold - 1 yr",
+              "amount": 1200
+            },
+            {
+              "label": "Corporate annual rolling membership - Silver - 1 yr",
+              "amount": 900.45
+            }
+          ]
+        },
+        {
+          "is_required": 0,
+          "label": "Add-On",
+          "html_type": "CheckBox",
+          "values": [
+            {
+              "label": "Corporate annual rolling membership - Add-on1 - 1 yr",
+              "amount": 900
+            },
+            {
+              "label": "Corporate annual rolling membership - Add-on2 - 1 yr",
+              "amount": 900
+            },
+            {
+              "label": "Corporate annual rolling membership - Add-on3 - 1 yr",
+              "amount": 900,
+              "is_default": 1
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
