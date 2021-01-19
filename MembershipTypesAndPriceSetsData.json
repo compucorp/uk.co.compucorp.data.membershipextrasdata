@@ -69,12 +69,131 @@
         "relationship_name": "Employer of",
         "relationship_direction": "b_a"
       }
+    },
+    "Demo organisation 21 - Individual fixed Gold - 1yr": {
+      "membership_type": {
+        "name": "Individual annual fixed membership - Gold - 1 yr",
+        "minimum_fee": 120,
+        "fixed_period_start_day": "101",
+        "fixed_period_rollover_day": "1231",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 22 - Individual fixed Silver - 1yr": {
+      "membership_type": {
+        "name": "Individual annual fixed membership - Silver - 1 yr",
+        "minimum_fee": 90.45,
+        "fixed_period_start_day": "101",
+        "fixed_period_rollover_day": "1231",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 23 - Individual fixed Add-on1 - 1yr": {
+      "membership_type": {
+        "name": "Individual annual fixed membership - Add-on1 - 1 yr",
+        "minimum_fee": 90,
+        "fixed_period_start_day": "801",
+        "fixed_period_rollover_day": "731",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 24 - Individual fixed Add-on2 - 1yr": {
+      "membership_type": {
+        "name": "Individual annual fixed membership - Add-on2 - 1 yr",
+        "minimum_fee": 90,
+        "fixed_period_start_day": "1201",
+        "fixed_period_rollover_day": "1130",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 25 - Individual fixed Add-on3 - 1yr": {
+      "membership_type": {
+        "name": "Individual annual fixed membership - Add-on3 - 1 yr",
+        "minimum_fee": 90,
+        "fixed_period_start_day": "701",
+        "fixed_period_rollover_day": "630",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 26 - Corporate fixed - Gold - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual fixed membership - Gold - 1 yr",
+        "minimum_fee": 1200,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a",
+        "fixed_period_start_day": "101",
+        "fixed_period_rollover_day": "1231",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 27 - Corporate fixed - Silver - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual fixed membership - Silver - 1 yr",
+        "minimum_fee": 900.45,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a",
+        "fixed_period_start_day": "101",
+        "fixed_period_rollover_day": "1231",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 28 - Corporate fixed - Add-on1 - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual fixed membership - Add-on1 - 1 yr",
+        "minimum_fee": 900,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a",
+        "fixed_period_start_day": "801",
+        "fixed_period_rollover_day": "731",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 29 - Corporate fixed - Add-on2 - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual fixed membership - Add-on2 - 1 yr",
+        "minimum_fee": 900,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a",
+        "fixed_period_start_day": "1201",
+        "fixed_period_rollover_day": "1130",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 30 - Corporate fixed - Add-on3 - 1yr": {
+      "membership_type": {
+        "name": "Corporate annual fixed membership - Add-on3 - 1 yr",
+        "minimum_fee": 900,
+        "relationship_name": "Employer of",
+        "relationship_direction": "b_a",
+        "fixed_period_start_day": "701",
+        "fixed_period_rollover_day": "630",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 31 - Monthly fixed": {
+      "membership_type": {
+        "name": "Monthly fixed membership 1",
+        "duration_unit": "month",
+        "minimum_fee": 10,
+        "fixed_period_rollover_day": "31",
+        "period_type": "fixed"
+      }
+    },
+    "Demo organisation 32 - Monthly fixed": {
+      "membership_type": {
+        "name": "Monthly fixed membership 2",
+        "duration_unit": "month",
+        "minimum_fee": 10.55,
+        "fixed_period_rollover_day": "31",
+        "period_type": "fixed"
+      }
     }
   },
   "priceSetData": [
     {
       "title": "Individual Membership Rolling",
       "min_amount": 100,
+      "financial_type_id": "Member Dues",
       "fields": [
         {
           "is_required": 1,
@@ -116,6 +235,7 @@
     {
       "title": "Corporate Membership Rolling",
       "min_amount": 100,
+      "financial_type_id": "Member Dues",
       "fields": [
         {
           "is_required": 1,
@@ -147,6 +267,90 @@
             },
             {
               "label": "Corporate annual rolling membership - Add-on3 - 1 yr",
+              "amount": 900,
+              "is_default": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Individual Membership Fixed",
+      "min_amount": 100,
+      "financial_type_id": "Member Dues",
+      "fields": [
+        {
+          "is_required": 1,
+          "label": "Standard",
+          "html_type": "Select",
+          "values": [
+            {
+              "label": "Individual annual fixed membership - Gold - 1 yr",
+              "amount": 120
+            },
+            {
+              "label": "Individual annual fixed membership - Silver - 1 yr",
+              "amount": 90.45
+            }
+          ]
+        },
+        {
+          "is_required": 0,
+          "label": "Add-On",
+          "html_type": "CheckBox",
+          "values": [
+            {
+              "label": "Individual annual fixed membership - Add-on1 - 1 yr",
+              "amount": 90
+            },
+            {
+              "label": "Individual annual fixed membership - Add-on2 - 1 yr",
+              "amount": 90
+            },
+            {
+              "label": "Individual annual fixed membership - Add-on3 - 1 yr",
+              "amount": 90,
+              "is_default": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Corporate Membership Fixed",
+      "min_amount": 100,
+      "financial_type_id": "Member Dues",
+      "fields": [
+        {
+          "is_required": 1,
+          "label": "Standard",
+          "html_type": "Select",
+          "values": [
+            {
+              "label": "Corporate annual fixed membership - Gold - 1 yr",
+              "amount": 1200
+            },
+            {
+              "label": "Corporate annual fixed membership - Silver - 1 yr",
+              "amount": 900.45
+            }
+          ]
+        },
+        {
+          "is_required": 0,
+          "label": "Add-On",
+          "html_type": "CheckBox",
+          "values": [
+            {
+              "label": "Corporate annual fixed membership - Add-on1 - 1 yr",
+              "amount": 900
+            },
+            {
+              "label": "Corporate annual fixed membership - Add-on2 - 1 yr",
+              "amount": 900
+            },
+            {
+              "label": "Corporate annual fixed membership - Add-on3 - 1 yr",
               "amount": 900,
               "is_default": 1
             }
