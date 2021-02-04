@@ -1095,7 +1095,7 @@ array(
               'contribution' => array(
                 1 => array(
                   'contribution_page_id' => '1',
-                  'payment_processor_id' => '1',
+                  'payment_processor_id' => '3',
                   'honor_type_id' => '1',
                   'is_test' => '0',
                   'frequency_unit' => 'year',

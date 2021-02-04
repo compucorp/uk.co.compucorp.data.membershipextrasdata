@@ -41,6 +41,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createPriceSetsAndFields();
     $this->createDiscountCodes();
     $this->createTestingWebforms();
+    $this->setDefaultManualDirectDebitConfigurations();
   }
 
   /**
@@ -358,6 +359,22 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       $wf_me_discount_settings = new wf_me_discount_settings();
       $wf_me_discount_settings->save($webformsNid, 1);
     }
+  }
+
+  /**
+   * Set default manual direct debit configurations
+   */
+  private function setDefaultManualDirectDebitConfigurations() {
+    $configFields = [
+      'manualdirectdebit_default_reference_prefix' => 'DD',
+      'manualdirectdebit_minimum_reference_prefix_length' => 6,
+      'manualdirectdebit_new_instruction_run_dates' => [1],
+      'manualdirectdebit_payment_collection_run_dates' => [1],
+      'manualdirectdebit_minimum_days_to_first_payment' => 2,
+      'manualdirectdebit_days_in_advance_for_collection_reminder' => 3,
+      'manualdirectdebit_batch_submission_queue_limit' => 50,
+    ];
+    Civi::settings()->add($configFields);
   }
 
 }
