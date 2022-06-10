@@ -42,6 +42,7 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
     $this->createDiscountCodes();
     $this->createTestingWebforms();
     $this->setDefaultManualDirectDebitConfigurations();
+    $this->createEventWithFees();
   }
 
   /**
@@ -375,6 +376,48 @@ class CRM_Membershipextrasdata_Upgrader extends CRM_Membershipextrasdata_Upgrade
       'manualdirectdebit_batch_submission_queue_limit' => 50,
     ];
     Civi::settings()->add($configFields);
+  }
+
+  private function createEventWithFees() {
+    $eventFeeFinancialTypeId = 4;
+
+    $event = civicrm_api3('Event', 'create', [
+      'event_type_id' => 'Conference',
+      'default_role_id' => 'Attendee',
+      'title' => 'Test 1',
+      'start_date' => "2022-01-01",
+      'is_public' => 1,
+      'is_online_registration' => 1,
+      'is_monetary' => 1,
+      'payment_processor' => 'Offline Recurring Contribution',
+      'financial_type_id' => $eventFeeFinancialTypeId,
+      'fee_label' => "Event Fees",
+    ]);
+
+    // add one event fee
+    civicrm_api3('PriceSet', 'create', [
+      'title' => 'Test Event 1',
+      'name' => 'test_event_1',
+      'extends' => 'CiviEvent',
+      'financial_type_id' => $eventFeeFinancialTypeId,
+      'is_quick_config' => 1,
+      'entity_table' => 'civicrm_event',
+      'entity_id' => $event['id'],
+    ]);
+    $priceField = civicrm_api3('PriceField', 'create', [
+      'label' => 'test1',
+      'name' => 'test1',
+      'price_set_id' => 'test_event_1',
+      'html_type' => 'Radio',
+      'financial_type_id' => $eventFeeFinancialTypeId,
+    ]);
+    civicrm_api3('PriceFieldValue', 'create', [
+      'price_field_id' => $priceField['id'],
+      'financial_type_id' => $eventFeeFinancialTypeId,
+      'label' => 'test fee',
+      'amount' => 100,
+      'is_default' => 1,
+    ]);
   }
 
 }
